@@ -13,11 +13,11 @@ app = FastAPI(title="Comunidade Gestor API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"], # Por enquanto liberamos tudo para testar o deploy
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 db = Prisma()
 
 # 2. Esquemas de Dados (Pydantic)
