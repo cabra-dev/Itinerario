@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from prisma import Prisma
@@ -8,16 +7,17 @@ from typing import List
 from datetime import datetime
 
 # 1. Configurações Iniciais
-load_dotenv()
+# No Render, as variáveis de ambiente já estão no SO, load_dotenv é opcional mas não atrapalha
 app = FastAPI(title="Comunidade Gestor API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Por enquanto liberamos tudo para testar o deploy
+    allow_origins=["*"], # Essencial para o seu React (Vercel) conseguir acessar
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 db = Prisma()
 
 # 2. Esquemas de Dados (Pydantic)
@@ -28,12 +28,13 @@ class ProdutoCreate(BaseModel):
     estoque: int
 
 class VendaCreate(BaseModel):
-    produto_id: int  # Deve ser exatamente igual ao que você manda no axios do React
+    produto_id: int 
     quantidade: int
 
 # 3. Ciclo de Vida do Banco
 @app.on_event("startup")
 async def startup():
+    # Ponto crítico: Garante a conexão com o Neon no início
     await db.connect()
 
 @app.on_event("shutdown")
@@ -95,6 +96,7 @@ async def registrar_venda(venda: VendaCreate):
 
     valor_total = produto.preco * venda.quantidade
 
+    # Transação garante que ou tudo acontece ou nada (QA: Atomicidade)
     async with db.tx() as transaction:
         await transaction.produto.update(
             where={'id': venda.produto_id},
@@ -147,7 +149,10 @@ async def relatorio_vendas():
         } for v in vendas
     ]
 
-# 7. Execução do Servidor
+# 7. Execução do Servidor (Modificado para Deploy)
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    # Em produção, o Render ignora esse bloco e usa o Start Command das configurações
+    # Deixamos como 0.0.0.0 para aceitar conexões externas caso teste localmente em rede
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
