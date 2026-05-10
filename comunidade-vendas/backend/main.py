@@ -34,8 +34,13 @@ class VendaCreate(BaseModel):
 # 3. Ciclo de Vida do Banco
 @app.on_event("startup")
 async def startup():
-    # Ponto crítico: Garante a conexão com o Neon no início
-    await db.connect()
+    try:
+        # Tenta conectar, mas se falhar, printa o erro no log e não deixa o app morrer
+        await db.connect()
+        print("✅ Banco conectado com sucesso!")
+    except Exception as e:
+        print(f"❌ Erro crítico no banco: {e}")
+        # Não dê raise aqui agora, deixe o app subir mesmo sem banco só para testar
 
 @app.on_event("shutdown")
 async def shutdown():
