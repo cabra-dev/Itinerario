@@ -2,30 +2,36 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from prisma import Prisma
-from pydantic import BaseModel
-from typing import List
+from pydantic import BaseModel, Field
+from typing import List, Optional
 from datetime import datetime
 
-# 1. Configurações Iniciais
-# No Render, as variáveis de ambiente já estão no SO, load_dotenv é opcional mas não atrapalha
 app = FastAPI(title="Comunidade Gestor API")
+
+# 1. Configuração de CORS (Ajustada para matar o erro 403 e CORS Error)
+origins = [
+    "https://itinerario-sigma.vercel.app", # Sua URL da Vercel
+    "http://localhost:5173",               # Vite Local
+    "http://127.0.0.1:5173",
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Essencial para o seu React (Vercel) conseguir acessar
+    allow_origins=origins, 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 db = Prisma()
 
-# 2. Esquemas de Dados (Pydantic)
+# 2. Esquemas de Dados
 class ProdutoCreate(BaseModel):
-    nome: str
-    categoria: str
-    preco: float
-    estoque: int
+    nome: str = Field(..., min_length=1)
+    categoria: str = Field(..., min_length=1)
+    preco: float = Field(..., gt=0) # gt=0 significa "Greater Than 0" (Maior que zero)
+    estoque: int = Field(..., ge=0) # ge=0 significa "Greater or Equal 0" (Maior ou igual a zero)
 
 class VendaCreate(BaseModel):
     produto_id: int 
@@ -35,34 +41,39 @@ class VendaCreate(BaseModel):
 @app.on_event("startup")
 async def startup():
     try:
-        # Tenta conectar, mas se falhar, printa o erro no log e não deixa o app morrer
         await db.connect()
         print("✅ Banco conectado com sucesso!")
     except Exception as e:
         print(f"❌ Erro crítico no banco: {e}")
-        # Não dê raise aqui agora, deixe o app subir mesmo sem banco só para testar
 
 @app.on_event("shutdown")
 async def shutdown():
-    await db.disconnect()
+    if db.is_connected():
+        await db.disconnect()
 
-# 4. Rotas de Produtos (CRUD Completo)
+# 4. Rotas de Produtos
 
 @app.get("/produtos")
 async def listar_produtos():
-    return await db.produto.find_many(order={'nome': 'asc'})
+    try:
+        return await db.produto.find_many(order={'nome': 'asc'})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao buscar produtos: {str(e)}")
 
 @app.post("/produtos")
 async def criar_produto(dados: ProdutoCreate):
-    return await db.produto.create(
-        data={
-            "nome": dados.nome,
-            "categoria": dados.categoria,
-            "preco": dados.preco,
-            "estoque": dados.estoque,
-            "vendido": 0
-        }
-    )
+    try:
+        return await db.produto.create(
+            data={
+                "nome": dados.nome,
+                "categoria": dados.categoria,
+                "preco": dados.preco,
+                "estoque": dados.estoque,
+                "vendido": 0
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Erro ao criar produto.")
 
 @app.put("/produtos/{id}")
 async def editar_produto(id: int, dados: ProdutoCreate):
@@ -82,13 +93,17 @@ async def editar_produto(id: int, dados: ProdutoCreate):
 @app.delete("/produtos/{id}")
 async def deletar_produto(id: int):
     try:
+        # QA: Verifica se existem vendas antes de deletar (Integridade Referencial)
+        vendas = await db.venda.find_first(where={'produtoId': id})
+        if vendas:
+            raise HTTPException(status_code=400, detail="Não é possível deletar produto com histórico de vendas.")
+        
         await db.produto.delete(where={'id': id})
         return {"message": "Removido com sucesso"}
+    except HTTPException as e:
+        raise e
     except Exception:
-        raise HTTPException(
-            status_code=400, 
-            detail="Não é possível deletar produto com histórico de vendas."
-        )
+        raise HTTPException(status_code=500, detail="Erro interno ao deletar.")
 
 # 5. Rotas de Vendas
 
@@ -96,68 +111,68 @@ async def deletar_produto(id: int):
 async def registrar_venda(venda: VendaCreate):
     produto = await db.produto.find_unique(where={'id': venda.produto_id})
     
-    if not produto or produto.estoque < venda.quantidade:
-        raise HTTPException(status_code=400, detail="Venda inválida ou estoque insuficiente.")
+    if not produto:
+        raise HTTPException(status_code=404, detail="Produto não encontrado.")
+    
+    if produto.estoque < venda.quantidade:
+        raise HTTPException(status_code=400, detail="Estoque insuficiente.")
 
     valor_total = produto.preco * venda.quantidade
 
-    # Transação garante que ou tudo acontece ou nada (QA: Atomicidade)
-    async with db.tx() as transaction:
-        await transaction.produto.update(
-            where={'id': venda.produto_id},
-            data={
-                'estoque': produto.estoque - venda.quantidade,
-                'vendido': produto.vendido + venda.quantidade
-            }
-        )
-        nova_venda = await transaction.venda.create(
-            data={
-                'produtoId': venda.produto_id,
-                'quantidade': venda.quantidade,
-                'valorTotal': valor_total
-            }
-        )
-    return nova_venda
+    try:
+        async with db.tx() as transaction:
+            # Baixa o estoque e aumenta o contador de vendidos
+            await transaction.produto.update(
+                where={'id': venda.produto_id},
+                data={
+                    'estoque': produto.estoque - venda.quantidade,
+                    'vendido': produto.vendido + venda.quantidade
+                }
+            )
+            # Cria o registro da venda
+            nova_venda = await transaction.venda.create(
+                data={
+                    'produtoId': venda.produto_id,
+                    'quantidade': venda.quantidade,
+                    'valorTotal': valor_total
+                }
+            )
+        return nova_venda
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Erro ao processar transação de venda.")
 
-# 6. Dashboard e Relatórios
+# 6. Dashboard e Estatísticas
 
 @app.get("/dashboard/stats")
 async def get_stats():
-    produtos = await db.produto.find_many()
-    vendas = await db.venda.find_many()
+    try:
+        produtos = await db.produto.find_many()
+        vendas = await db.venda.find_many()
 
-    total_estoque_valor = sum(p.estoque * p.preco for p in produtos) if produtos else 0
-    faturamento_total = sum(v.valorTotal for v in vendas) if vendas else 0
-    itens_baixo_estoque = len([p for p in produtos if p.estoque < 5]) if produtos else 0
-    total_itens_vendidos = sum(p.vendido for p in produtos) if produtos else 0
-    
-    return {
-        "total_estoque_valor": total_estoque_valor,
-        "faturamento_total": faturamento_total,
-        "itens_baixo_estoque": itens_baixo_estoque,
-        "total_itens_vendidos": total_itens_vendidos,
-        "total_produtos_cadastrados": len(produtos),
-    }
+        total_estoque_valor = sum(p.estoque * p.preco for p in produtos) if produtos else 0
+        faturamento_total = sum(v.valorTotal for v in vendas) if vendas else 0
+        itens_baixo_estoque = len([p for p in produtos if p.estoque < 5]) if produtos else 0
+        total_itens_vendidos = sum(p.vendido for p in produtos) if produtos else 0
+        
+        return {
+            "total_estoque_valor": total_estoque_valor,
+            "faturamento_total": faturamento_total,
+            "itens_baixo_estoque": itens_baixo_estoque,
+            "total_itens_vendidos": total_itens_vendidos,
+            "total_produtos_cadastrados": len(produtos),
+        }
+    except Exception as e:
+        print(f"Erro Stats: {e}")
+        return {
+            "total_estoque_valor": 0,
+            "faturamento_total": 0,
+            "itens_baixo_estoque": 0,
+            "total_itens_vendidos": 0,
+            "total_produtos_cadastrados": 0,
+        }
 
-@app.get("/relatorios/vendas-recentes")
-async def relatorio_vendas():
-    vendas = await db.venda.find_many(
-        include={'produto': True},
-        order={'dataVenda': 'desc'}
-    )
-    return [
-        {
-            "data": v.dataVenda.strftime("%d/%m/%Y %H:%M"),
-            "produto": v.produto.nome if v.produto else "Excluído",
-            "quantidade": v.quantidade,
-            "total": v.valorTotal
-        } for v in vendas
-    ]
-
-# 7. Execução do Servidor (Modificado para Deploy)
+# 7. Execução
 if __name__ == "__main__":
     import uvicorn
-    # Em produção, o Render ignora esse bloco e usa o Start Command das configurações
-    # Deixamos como 0.0.0.0 para aceitar conexões externas caso teste localmente em rede
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)

@@ -15,7 +15,10 @@ export default function Inventario() {
   const totalPaginas = Math.max(1, Math.ceil(produtos.length / itensPorPagina));
   const indiceUltimoItem = paginaAtual * itensPorPagina;
   const indicePrimeiroItem = indiceUltimoItem - itensPorPagina;
-  const produtosPaginados = produtos.slice(indicePrimeiroItem, indiceUltimoItem);
+  const produtosPaginados = produtos.slice(
+    indicePrimeiroItem,
+    indiceUltimoItem,
+  );
 
   // FUNÇÃO DE EXPORTAÇÃO PDF
   const exportarPDF = () => {
@@ -54,7 +57,15 @@ export default function Inventario() {
     doc.save("inventario-comunidade.pdf");
   };
 
-  if (loading) return <div className="container" style={{ textAlign: 'center', padding: '2rem' }}>Carregando inventário...</div>;
+  if (loading)
+    return (
+      <div
+        className="container"
+        style={{ textAlign: "center", padding: "2rem" }}
+      >
+        Carregando inventário...
+      </div>
+    );
 
   return (
     <div className="container">
@@ -91,7 +102,9 @@ export default function Inventario() {
           </button>
 
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span style={{ fontSize: "1rem", color: "#000000", fontWeight: "bold" }}>
+            <span
+              style={{ fontSize: "1rem", color: "#000000", fontWeight: "bold" }}
+            >
               Mostrar:
             </span>
             <select
@@ -118,14 +131,16 @@ export default function Inventario() {
 
       {/* QUADRO BRANCO (ESTADO VAZIO) */}
       {produtos.length === 0 ? (
-        <div style={{
-          backgroundColor: "#ffffff",
-          border: "2px dashed #cbd5e1",
-          borderRadius: "12px",
-          padding: "3rem",
-          textAlign: "center",
-          color: "#64748b"
-        }}>
+        <div
+          style={{
+            backgroundColor: "#ffffff",
+            border: "2px dashed #cbd5e1",
+            borderRadius: "12px",
+            padding: "3rem",
+            textAlign: "center",
+            color: "#64748b",
+          }}
+        >
           <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>📦</div>
           <h2 style={{ color: "#334155" }}>Seu inventário está vazio</h2>
           <p>Cadastre produtos para que eles apareçam aqui.</p>
@@ -134,73 +149,231 @@ export default function Inventario() {
         <>
           <div
             className="card"
-            style={{ padding: "0", overflowX: "auto", border: "1px solid #cbd5e1" }}
+            style={{
+              padding: "0",
+              overflowX: "auto",
+              border: "1px solid #cbd5e1",
+            }}
           >
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ backgroundColor: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>
-                  <th style={{ padding: "12px", textAlign: "left", fontWeight: "bold", color: "#374151" }}>Produto</th>
-                  <th style={{ padding: "12px", textAlign: "left", fontWeight: "bold", color: "#374151" }}>Categoria</th>
-                  <th style={{ padding: "12px", textAlign: "left", fontWeight: "bold", color: "#374151" }}>Preço</th>
-                  <th style={{ padding: "12px", textAlign: "left", fontWeight: "bold", color: "#374151" }}>Estoque</th>
-                  <th style={{ padding: "12px", textAlign: "left", fontWeight: "bold", color: "#374151" }}>Total</th>
-                  <th style={{ padding: "12px", textAlign: "center", fontWeight: "bold", color: "#374151" }}>Ações</th>
+                <tr
+                  style={{
+                    backgroundColor: "#f8fafc",
+                    borderBottom: "2px solid #e2e8f0",
+                  }}
+                >
+                  <th
+                    style={{
+                      padding: "12px",
+                      textAlign: "left",
+                      fontWeight: "bold",
+                      color: "#374151",
+                    }}
+                  >
+                    Produto
+                  </th>
+                  <th
+                    style={{
+                      padding: "12px",
+                      textAlign: "left",
+                      fontWeight: "bold",
+                      color: "#374151",
+                    }}
+                  >
+                    Categoria
+                  </th>
+                  <th
+                    style={{
+                      padding: "12px",
+                      textAlign: "left",
+                      fontWeight: "bold",
+                      color: "#374151",
+                    }}
+                  >
+                    Preço
+                  </th>
+                  <th
+                    style={{
+                      padding: "12px",
+                      textAlign: "left",
+                      fontWeight: "bold",
+                      color: "#374151",
+                    }}
+                  >
+                    Estoque
+                  </th>
+                  <th
+                    style={{
+                      padding: "12px",
+                      textAlign: "left",
+                      fontWeight: "bold",
+                      color: "#374151",
+                    }}
+                  >
+                    Total
+                  </th>
+                  <th
+                    style={{
+                      padding: "12px",
+                      textAlign: "center",
+                      fontWeight: "bold",
+                      color: "#374151",
+                    }}
+                  >
+                    Ações
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {produtosPaginados.map((produto: any) => (
-                  <tr key={produto.id} style={{ borderBottom: "1px solid #e2e8f0" }}>
-                    <td style={{ padding: "12px" }}>
+                  <tr
+                    key={produto.id}
+                    style={{ borderBottom: "1px solid #e2e8f0" }}
+                  >
+                    <td
+                      style={{
+                        padding: "12px",
+                        maxWidth: "200px",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
                       {editandoId === produto.id ? (
                         <input
                           type="text"
                           value={formEdit.nome || produto.nome}
-                          onChange={(e) => setFormEdit({ ...formEdit, nome: e.target.value })}
-                          style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px" }}
+                          onChange={(e) =>
+                            setFormEdit({ ...formEdit, nome: e.target.value })
+                          }
+                          style={{
+                            width: "100%",
+                            padding: "8px",
+                            border: "1px solid #d1d5db",
+                            borderRadius: "4px",
+                          }}
                         />
                       ) : (
                         produto.nome
                       )}
                     </td>
-                    <td style={{ padding: "12px" }}>
+                    <td
+                      style={{
+                        padding: "12px",
+                        maxWidth: "200px",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
                       {editandoId === produto.id ? (
                         <input
                           type="text"
                           value={formEdit.categoria || produto.categoria}
-                          onChange={(e) => setFormEdit({ ...formEdit, categoria: e.target.value })}
-                          style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px" }}
+                          onChange={(e) =>
+                            setFormEdit({
+                              ...formEdit,
+                              categoria: e.target.value,
+                            })
+                          }
+                          style={{
+                            width: "100%",
+                            padding: "8px",
+                            border: "1px solid #d1d5db",
+                            borderRadius: "4px",
+                          }}
                         />
                       ) : (
                         produto.categoria
                       )}
                     </td>
-                    <td style={{ padding: "12px" }}>
+                    <td
+                      style={{
+                        padding: "12px",
+                        maxWidth: "200px",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
                       {editandoId === produto.id ? (
                         <input
                           type="number"
                           step="0.01"
-                          value={formEdit.preco || produto.preco}
-                          onChange={(e) => setFormEdit({ ...formEdit, preco: parseFloat(e.target.value) })}
-                          style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px" }}
+                          value={formEdit.preco ?? produto.preco}
+                          onChange={(e) => {
+                            const val = e.target.value;
+
+                            // QA: Permite que o campo fique vazio para você digitar um novo valor
+                            if (val === "") {
+                              setFormEdit({ ...formEdit, preco: "" });
+                              return;
+                            }
+
+                            // Impede apenas valores negativos
+                            if (parseFloat(val) < 0) return;
+
+                            setFormEdit({ ...formEdit, preco: val });
+                          }}
+                          onBlur={() => {
+                            // Só valida se o valor é maior que zero quando você sai do campo
+                            const val = parseFloat(formEdit.preco);
+                            if (isNaN(val) || val <= 0) {
+                              alert("O preço deve ser maior que zero.");
+                              setFormEdit({
+                                ...formEdit,
+                                preco: produto.preco,
+                              }); // Volta ao valor original se estiver errado
+                            }
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "8px",
+                            border: "1px solid #d1d5db",
+                            borderRadius: "4px",
+                          }}
                         />
                       ) : (
                         `R$ ${produto.preco.toFixed(2)}`
                       )}
                     </td>
-                    <td style={{ padding: "12px" }}>
+                    <td
+                      style={{
+                        padding: "12px",
+                        maxWidth: "200px",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
                       {editandoId === produto.id ? (
                         <input
                           type="number"
                           value={formEdit.estoque || produto.estoque}
-                          onChange={(e) => setFormEdit({ ...formEdit, estoque: parseInt(e.target.value) })}
-                          style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px" }}
+                          onChange={(e) =>
+                            setFormEdit({
+                              ...formEdit,
+                              estoque: parseInt(e.target.value),
+                            })
+                          }
+                          style={{
+                            width: "100%",
+                            padding: "8px",
+                            border: "1px solid #d1d5db",
+                            borderRadius: "4px",
+                          }}
                         />
                       ) : (
                         `${produto.estoque} un.`
                       )}
                     </td>
-                    <td style={{ padding: "12px" }}>
-                      R$ {(produto.preco * produto.estoque).toFixed(2)}
+                    <td style={{ padding: "12px", wordBreak: "break-all" }}>
+                      R${" "}
+                      {(produto.preco * produto.estoque).toLocaleString(
+                        "pt-BR",
+                        { minimumFractionDigits: 2 },
+                      )}
                     </td>
                     <td style={{ padding: "12px", textAlign: "center" }}>
                       {editandoId === produto.id ? (
@@ -211,7 +384,15 @@ export default function Inventario() {
                               setEditandoId(null);
                               setFormEdit({});
                             }}
-                            style={{ backgroundColor: "#10b981", color: "#ffffff", padding: "6px 12px", borderRadius: "4px", border: "none", cursor: "pointer", marginRight: "8px" }}
+                            style={{
+                              backgroundColor: "#10b981",
+                              color: "#ffffff",
+                              padding: "6px 12px",
+                              borderRadius: "4px",
+                              border: "none",
+                              cursor: "pointer",
+                              marginRight: "8px",
+                            }}
                           >
                             Salvar
                           </button>
@@ -220,7 +401,14 @@ export default function Inventario() {
                               setEditandoId(null);
                               setFormEdit({});
                             }}
-                            style={{ backgroundColor: "#6b7280", color: "#ffffff", padding: "6px 12px", borderRadius: "4px", border: "none", cursor: "pointer" }}
+                            style={{
+                              backgroundColor: "#6b7280",
+                              color: "#ffffff",
+                              padding: "6px 12px",
+                              borderRadius: "4px",
+                              border: "none",
+                              cursor: "pointer",
+                            }}
                           >
                             Cancelar
                           </button>
@@ -232,13 +420,28 @@ export default function Inventario() {
                               setEditandoId(produto.id);
                               setFormEdit(produto);
                             }}
-                            style={{ backgroundColor: "#3b82f6", color: "#ffffff", padding: "6px 12px", borderRadius: "4px", border: "none", cursor: "pointer", marginRight: "8px" }}
+                            style={{
+                              backgroundColor: "#3b82f6",
+                              color: "#ffffff",
+                              padding: "6px 12px",
+                              borderRadius: "4px",
+                              border: "none",
+                              cursor: "pointer",
+                              marginRight: "8px",
+                            }}
                           >
                             Editar
                           </button>
                           <button
                             onClick={() => deletarProduto(produto.id)}
-                            style={{ backgroundColor: "#ef4444", color: "#ffffff", padding: "6px 12px", borderRadius: "4px", border: "none", cursor: "pointer" }}
+                            style={{
+                              backgroundColor: "#ef4444",
+                              color: "#ffffff",
+                              padding: "6px 12px",
+                              borderRadius: "4px",
+                              border: "none",
+                              cursor: "pointer",
+                            }}
                           >
                             Deletar
                           </button>
@@ -288,7 +491,8 @@ export default function Inventario() {
                 backgroundColor:
                   paginaAtual === totalPaginas ? "#f3f4f6" : "#ffffff",
                 color: paginaAtual === totalPaginas ? "#9ca3af" : "#374151",
-                cursor: paginaAtual === totalPaginas ? "not-allowed" : "pointer",
+                cursor:
+                  paginaAtual === totalPaginas ? "not-allowed" : "pointer",
               }}
             >
               Próxima

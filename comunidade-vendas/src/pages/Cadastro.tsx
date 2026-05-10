@@ -18,136 +18,120 @@ export default function Cadastro() {
     e.preventDefault();
     setCarregando(true);
 
-    // QA: Sanitização de strings (remove espaços extras no início e fim)
     const nomeLimpo = form.nome.trim();
     const categoriaLimpa = form.categoria.trim();
     const precoNum = parseFloat(form.preco);
     const estoqueNum = parseInt(form.estoque);
 
-    // Validações de Segurança
-    if (!nomeLimpo || !categoriaLimpa) {
-      alert("Erro: Nome e categoria são campos obrigatórios.");
+    if (!nomeLimpo || !categoriaLimpa || isNaN(precoNum) || isNaN(estoqueNum) || precoNum <= 0) {
+      alert("⚠️ Preencha todos os campos corretamente. O preço deve ser maior que zero.");
       setCarregando(false);
       return;
     }
 
-    if (isNaN(precoNum) || precoNum <= 0) {
-      alert("Erro: O preço deve ser maior que zero.");
-      setCarregando(false);
-      return;
-    }
+    try {
+      const sucesso = await cadastrarProduto({
+        nome: nomeLimpo,
+        categoria: categoriaLimpa,
+        preco: precoNum,
+        estoque: estoqueNum,
+      });
 
-    if (isNaN(estoqueNum) || estoqueNum < 0) {
-      alert("Erro: O estoque não pode ser negativo.");
-      setCarregando(false);
-      return;
-    }
-
-    const sucesso = await cadastrarProduto({
-      nome: nomeLimpo,
-      categoria: categoriaLimpa,
-      preco: precoNum,
-      estoque: estoqueNum,
-    });
-
-    if (sucesso) {
-      alert("✅ Produto cadastrado com sucesso!");
-      navigate("/inventario");
-    } else {
+      if (sucesso) {
+        alert("✅ Produto cadastrado com sucesso!");
+        navigate("/inventario");
+      } else {
+        alert("❌ Erro ao cadastrar. Verifique a conexão com o servidor (CORS).");
+        setCarregando(false);
+      }
+    } catch (err) {
+      alert("❌ Falha crítica na comunicação com o backend.");
       setCarregando(false);
     }
   };
 
   return (
-    <div className="container">
-      <h1 style={{ color: "#000000", textAlign: 'center' }}>Cadastrar Novo Item</h1>
-      
-      <div
-        className="card"
-        style={{
-          maxWidth: "500px",
-          margin: "2rem auto",
+    <div className="container" style={{ padding: "10px" }}>
+      <h1 style={{ textAlign: 'center', marginBottom: '1rem', color: "#000" }}>
+        Cadastrar Novo Item
+      </h1>
+      <div 
+        className="card" 
+        style={{ 
+          maxWidth: "500px", 
+          margin: "0 auto", 
           border: "1px solid #cbd5e1",
-          boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)"
+          boxSizing: "border-box",
+          padding: "20px"
         }}
       >
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: "1.2rem" }}>
-            <label style={{ fontWeight: "bold", color: "#374151" }}>
-              Nome do Produto
-            </label>
+          <div style={{ marginBottom: "1rem" }}>
+            <label style={{ fontWeight: "bold", display: "block" }}>Nome do Produto</label>
             <input
               type="text"
               required
-              placeholder="Ex: Boneca de Pano"
+              className="form-control"
+              placeholder="Ex: Camiseta"
               value={form.nome}
               onChange={(e) => setForm({ ...form, nome: e.target.value })}
               style={inputStyleBase}
             />
           </div>
 
-          <div style={{ marginBottom: "1.2rem" }}>
-            <label style={{ fontWeight: "bold", color: "#374151" }}>
-              Categoria
-            </label>
+          <div style={{ marginBottom: "1rem" }}>
+            <label style={{ fontWeight: "bold", display: "block" }}>Categoria</label>
             <input
               type="text"
               required
-              placeholder="Ex: Artesanato"
+              className="form-control"
+              placeholder="Ex: Vestuário"
               value={form.categoria}
               onChange={(e) => setForm({ ...form, categoria: e.target.value })}
               style={inputStyleBase}
             />
           </div>
 
-          <div style={{ display: "flex", gap: "1rem", marginBottom: "1.5rem" }}>
-            <div style={{ flex: 1 }}>
-              <label style={{ fontWeight: "bold", color: "#374151" }}>
-                Preço
-              </label>
-              <div style={{ display: "flex", alignItems: "center", marginTop: "0.5rem" }}>
-                <span style={prefixStyle}>R$</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  required
-                  value={form.preco}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (val.includes("-")) return; 
-                    setForm({ ...form, preco: val });
-                  }}
-                  onBlur={() => {
-                    const val = parseFloat(form.preco);
-                    if (isNaN(val) || val <= 0) {
-                      setForm({ ...form, preco: "0.01" });
-                    }
-                  }}
-                  style={inputStyleRight}
-                />
-              </div>
-            </div>
-
-            <div style={{ flex: 1 }}>
-              <label style={{ fontWeight: "bold", color: "#374151" }}>
-                Estoque Inicial
-              </label>
+          <div style={{ 
+            display: "flex", 
+            gap: "1rem", 
+            marginBottom: "1.5rem",
+            flexWrap: "wrap" 
+          }}>
+            <div style={{ flex: "1 1 200px" }}>
+              <label style={{ fontWeight: "bold", display: "block" }}>Preço</label>
               <input
                 type="number"
+                step="0.01"
+                min="0.01"
                 required
+                className="form-control"
+                placeholder="0.00"
+                value={form.preco}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val.includes("-")) return;
+                  setForm({ ...form, preco: val });
+                }}
+                style={inputStyleBase}
+              />
+            </div>
+            <div style={{ flex: "1 1 200px" }}>
+              <label style={{ fontWeight: "bold", display: "block" }}>Estoque Inicial</label>
+              <input
+                type="number"
+                min="0"
+                required
+                className="form-control"
+                placeholder="0"
                 value={form.estoque}
                 onChange={(e) => {
                   const val = e.target.value;
-                  // Bloqueia negativos e decimais (estoque é inteiro)
+                  // Impede negativos, pontos e vírgulas (apenas inteiros)
                   if (val.includes("-") || val.includes(".") || val.includes(",")) return;
                   setForm({ ...form, estoque: val });
                 }}
-                onBlur={() => {
-                  if (!form.estoque || parseInt(form.estoque) < 0) {
-                    setForm({ ...form, estoque: "0" });
-                  }
-                }}
-                style={{ ...inputStyleBase, marginTop: "0.5rem", fontWeight: "bold" }}
+                style={inputStyleBase}
               />
             </div>
           </div>
@@ -155,20 +139,20 @@ export default function Cadastro() {
           <button
             type="submit"
             disabled={carregando}
-            style={{
-              width: "100%",
-              padding: "1rem",
-              backgroundColor: carregando ? "#94a3b8" : "#2563eb",
-              color: "white",
-              fontSize: "1.1rem",
+            className="btn btn-primary"
+            style={{ 
+              width: "100%", 
+              padding: "1rem", 
+              fontWeight: "bold", 
+              color: "#fff",
               border: "none",
-              borderRadius: "6px",
-              fontWeight: "bold",
+              borderRadius: "8px",
               cursor: carregando ? "not-allowed" : "pointer",
-              transition: "background-color 0.2s"
+              backgroundColor: carregando ? "#94a3b8" : "#000",
+              transition: "background 0.3s"
             }}
           >
-            {carregando ? "Processando..." : "Salvar Produto"}
+            {carregando ? "Salvando..." : "Salvar Produto"}
           </button>
         </form>
       </div>
@@ -176,34 +160,11 @@ export default function Cadastro() {
   );
 }
 
-// ESTILOS AUXILIARES
 const inputStyleBase = {
   width: "100%",
   padding: "0.8rem",
   marginTop: "0.5rem",
   border: "1px solid #cbd5e1",
-  borderRadius: "4px",
-  color: "#000000",
-  fontSize: "1rem",
-  outlineColor: "#2563eb"
-};
-
-const inputStyleRight = {
-  flex: 1,
-  padding: "0.8rem",
-  border: "1px solid #cbd5e1",
-  borderLeft: "none",
-  borderRadius: "0 4px 4px 0",
-  fontWeight: "bold" as const,
-  color: "#000000",
-  fontSize: "1rem"
-};
-
-const prefixStyle = {
-  backgroundColor: "#f8fafc",
-  border: "1px solid #cbd5e1",
-  padding: "0.8rem",
-  borderRadius: "4px 0 0 4px",
-  color: "#64748b",
-  fontWeight: "bold" as const,
+  borderRadius: "8px",
+  boxSizing: "border-box" as "border-box"
 };
