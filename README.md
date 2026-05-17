@@ -1,7 +1,7 @@
-📦 Comunidade Gestor
+# 📦 Comunidade Gestor
 Uma aplicação web Full-Stack desenvolvida para simplificar o controle de estoque, gerenciamento de inventário e lançamento de vendas de produtos. O sistema conta com validações robustas de segurança (anti-valores negativos), interface responsiva de alto contraste e exportação de relatórios nativos em PDF.
 
-🎯 Objetivo do Projeto
+# 🎯 Objetivo do Projeto
 O objetivo principal do Comunidade Gestor é oferecer uma ferramenta de controle interno centralizada e intuitiva para microempreendedores ou comunidades. Ele resolve o problema de perda de controle de insumos através de um fluxo automatizado: ao lançar uma venda, o estoque é baixado em tempo real usando transações seguras no banco de dados, recalculando o faturamento e o patrimônio total instantaneamente no Dashboard.
 
 🛠️ Tecnologias Utilizadas
@@ -44,11 +44,16 @@ cd backend
 python -m venv .venv
 
 # Ativar o ambiente virtual
-# No Windows (Command Prompt):
+No Windows (Command Prompt):
+
 .venv\Scripts\activate
-# No Windows (PowerShell):
+
+No Windows (PowerShell):
+
 .venv\Scripts\Activate.ps1
-# No Mac/Linux:
+
+No Mac/Linux:
+
 source .venv/bin/activate
 
 # Instalar as dependências do projeto
