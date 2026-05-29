@@ -1,4 +1,6 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from prisma import Prisma
@@ -42,9 +44,9 @@ class VendaCreate(BaseModel):
 async def startup():
     try:
         await db.connect()
-        print("✅ Banco conectado com sucesso!")
+        print("Banco conectado com sucesso!")
     except Exception as e:
-        print(f"❌ Erro crítico no banco: {e}")
+        print(f"Erro crítico no banco: {e}")
 
 @app.on_event("shutdown")
 async def shutdown():
