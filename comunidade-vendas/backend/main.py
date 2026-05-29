@@ -1,6 +1,15 @@
 import os
+import sys
 from dotenv import load_dotenv
-load_dotenv()
+
+# Encontra o .env tanto em desenvolvimento quanto instalado
+if getattr(sys, 'frozen', False):
+    base_path = os.path.dirname(sys.executable)
+else:
+    base_path = os.path.dirname(os.path.abspath(__file__))
+
+load_dotenv(os.path.join(base_path, '.env'))
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from prisma import Prisma
@@ -10,10 +19,10 @@ from datetime import datetime
 
 app = FastAPI(title="Comunidade Gestor API")
 
-# 1. Configuração de CORS (Ajustada para matar o erro 403 e CORS Error)
+# 1. Configuração de CORS
 origins = [
-    "https://itinerario-sigma.vercel.app", # Sua URL da Vercel
-    "http://localhost:5173",               # Vite Local
+    "https://itinerario-sigma.vercel.app",
+    "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
 
@@ -32,8 +41,8 @@ db = Prisma()
 class ProdutoCreate(BaseModel):
     nome: str = Field(..., min_length=1)
     categoria: str = Field(..., min_length=1)
-    preco: float = Field(..., gt=0) # gt=0 significa "Greater Than 0" (Maior que zero)
-    estoque: int = Field(..., ge=0) # ge=0 significa "Greater or Equal 0" (Maior ou igual a zero)
+    preco: float = Field(..., gt=0)
+    estoque: int = Field(..., ge=0)
 
 class VendaCreate(BaseModel):
     produto_id: int 
@@ -46,7 +55,7 @@ async def startup():
         await db.connect()
         print("Banco conectado com sucesso!")
     except Exception as e:
-        print(f"Erro crítico no banco: {e}")
+        print(f"Erro critico no banco: {e}")
 
 @app.on_event("shutdown")
 async def shutdown():
@@ -95,10 +104,9 @@ async def editar_produto(id: int, dados: ProdutoCreate):
 @app.delete("/produtos/{id}")
 async def deletar_produto(id: int):
     try:
-        # QA: Verifica se existem vendas antes de deletar (Integridade Referencial)
         vendas = await db.venda.find_first(where={'produtoId': id})
         if vendas:
-            raise HTTPException(status_code=400, detail="Não é possível deletar produto com histórico de vendas.")
+            raise HTTPException(status_code=400, detail="Nao e possivel deletar produto com historico de vendas.")
         
         await db.produto.delete(where={'id': id})
         return {"message": "Removido com sucesso"}
@@ -114,7 +122,7 @@ async def registrar_venda(venda: VendaCreate):
     produto = await db.produto.find_unique(where={'id': venda.produto_id})
     
     if not produto:
-        raise HTTPException(status_code=404, detail="Produto não encontrado.")
+        raise HTTPException(status_code=404, detail="Produto nao encontrado.")
     
     if produto.estoque < venda.quantidade:
         raise HTTPException(status_code=400, detail="Estoque insuficiente.")
@@ -123,7 +131,6 @@ async def registrar_venda(venda: VendaCreate):
 
     try:
         async with db.tx() as transaction:
-            # Baixa o estoque e aumenta o contador de vendidos
             await transaction.produto.update(
                 where={'id': venda.produto_id},
                 data={
@@ -131,7 +138,6 @@ async def registrar_venda(venda: VendaCreate):
                     'vendido': produto.vendido + venda.quantidade
                 }
             )
-            # Cria o registro da venda
             nova_venda = await transaction.venda.create(
                 data={
                     'produtoId': venda.produto_id,
@@ -141,7 +147,7 @@ async def registrar_venda(venda: VendaCreate):
             )
         return nova_venda
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Erro ao processar transação de venda.")
+        raise HTTPException(status_code=500, detail="Erro ao processar transacao de venda.")
 
 # 6. Dashboard e Estatísticas
 
