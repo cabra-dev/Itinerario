@@ -27,7 +27,7 @@
     },
     {
       "from": "backend/.env",
-      "to": "backend/.env"
+      "to": "backend/dist/.env"
     }
   ],
   "win": {
