@@ -1,87 +1,113 @@
-# 📦 Comunidade Gestor
-Uma aplicação web Full-Stack desenvolvida para simplificar o controle de estoque, gerenciamento de inventário e lançamento de vendas de produtos. O sistema conta com validações robustas de segurança (anti-valores negativos), interface responsiva de alto contraste e exportação de relatórios nativos em PDF.
+# 🧶 Comunidade Gestor
 
-# 🎯 Objetivo do Projeto
-O objetivo principal do Comunidade Gestor é oferecer uma ferramenta de controle interno centralizada e intuitiva para microempreendedores ou comunidades. Ele resolve o problema de perda de controle de insumos através de um fluxo automatizado: ao lançar uma venda, o estoque é baixado em tempo real usando transações seguras no banco de dados, recalculando o faturamento e o patrimônio total instantaneamente no Dashboard.
+Aplicação **desktop para Windows** desenvolvida para simplificar o controle de estoque, gerenciamento de inventário e lançamento de vendas de produtos artesanais. Conta com validações de segurança, interface de alto contraste e exportação de relatórios em PDF.
 
-🛠️ Tecnologias Utilizadas
-Frontend
-React (TypeScript) + Vite
+---
 
-React Router Dom (Gerenciamento de rotas)
+## 🎯 Objetivo
 
-Context API (Gerenciamento de estado global)
+O Comunidade Gestor foi criado para atender pequenos grupos de artesanato, oferecendo uma ferramenta centralizada e intuitiva. Ao lançar uma venda, o estoque é baixado em tempo real usando transações seguras no banco de dados, recalculando o faturamento e o patrimônio total instantaneamente no Dashboard.
 
-Axios (Integração HTTP)
+---
 
-jsPDF & jsPDF-AutoTable (Geração de relatórios)
+## 💻 Instalação (usuário final)
 
-Backend
-FastAPI (Python 3)
+1. Acesse a página de [Releases](https://github.com/cabra-dev/Itinerario/releases)
+2. Baixe o arquivo `Comunidade Gestor Setup 0.0.0.exe`
+3. Execute e siga a instalação normalmente
+4. Abra o app pelo atalho criado no Desktop
 
-Prisma ORM (Modelagem e consultas ao banco)
+> ⚠️ É necessário conexão com a internet, pois o banco de dados é online.
 
-Uvicorn (Servidor ASGI)
+---
 
-Pydantic (Validação e sanitização de dados)
+## 🛠️ Tecnologias
 
-🚀 Sequência de Instalação e Execução
-1. Pré-requisitos
-Certifique-se de ter instalado em sua máquina:
+**Desktop**
+- Electron — empacotamento como app desktop Windows
 
-Node.js (versão 18 ou superior)
+**Frontend**
+- React (TypeScript) + Vite
+- React Router Dom (HashRouter)
+- Context API
+- Axios
+- jsPDF & jsPDF-AutoTable
 
-Python (versão 3.10 ou superior)
+**Backend**
+- FastAPI (Python 3)
+- Prisma ORM + PostgreSQL (Neon)
+- Uvicorn
+- Pydantic
+- PyInstaller
 
-2. Configurando o Backend
-Abra o terminal na pasta raiz do repositório do backend e siga os passos abaixo:
+---
 
-Bash
-# Entrar na pasta do backend (se aplicável)
+## 🚀 Rodando em modo desenvolvimento
+
+### Pré-requisitos
+- Node.js 18+
+- Python 3.10+
+
+### 1. Configurando o Backend
+
+```bash
 cd backend
-
-# Criar o ambiente virtual do Python
 python -m venv .venv
-
-# Ativar o ambiente virtual
-No Windows (Command Prompt):
-
-.venv\Scripts\activate
-
-No Windows (PowerShell):
-
 .venv\Scripts\Activate.ps1
-
-No Mac/Linux:
-
-source .venv/bin/activate
-
-# Instalar as dependências do projeto
 pip install -r requirements.txt
-
-# Gerar o cliente do Prisma ORM
 python -m prisma generate
-
-# Sincronizar as tabelas com o banco de dados local
 python -m prisma db push
+```
 
-# Iniciar o servidor backend
-python main.py
-O servidor backend estará rodando em: http://localhost:8000
+Crie o arquivo `backend/.env`:
 
-3. Configurando o Frontend
-Abra um novo terminal na pasta raiz do repositório do frontend:
+DATABASE_URL="sua_url_do_banco_postgresql"
 
-Bash
-# Instalar os pacotes e dependências do Node
+### 2. Configurando o Frontend
+
+```bash
 npm install
-Antes de iniciar, crie um arquivo chamado .env na raiz da pasta do frontend para apontar para o seu servidor local:
+```
 
-Plaintext
+Crie o arquivo `.env` na raiz do projeto:
 VITE_API_URL=http://localhost:8000
-Agora, inicie o servidor de desenvolvimento do React:
 
-Bash
-# Iniciar a aplicação localmente
-npm run dev
-O frontend estará acessível através do endereço fornecido no terminal (geralmente http://localhost:5173).
+### 3. Rodando o app
+
+```bash
+npm run build
+npx electron .
+```
+
+### 4. Gerando o instalador
+
+```bash
+npm run dist-app
+```
+
+O instalador será gerado em `dist/Comunidade Gestor Setup 0.0.0.exe`.
+
+---
+
+## 📁 Estrutura do Projeto
+comunidade-vendas/
+├── backend/
+│   ├── main.py           # API FastAPI
+│   ├── schema.prisma     # Modelagem do banco
+│   ├── requirements.txt  # Dependências Python
+│   └── .env              # Variáveis de ambiente
+├── src/
+│   ├── pages/            # Dashboard, Inventário, Vendas, Cadastro
+│   ├── components/       # Header
+│   ├── context/          # DataContext
+│   └── api.ts            # Configuração do Axios
+├── electron.cjs          # Configuração do Electron
+├── package.json
+└── vite.config.ts
+
+---
+
+## ⚠️ Observações
+
+- O banco de dados é hospedado na nuvem ([Neon](https://neon.tech)), portanto é necessário internet para usar o app.
+- O backend Python é compilado como `.exe` via PyInstaller e já vem incluído no instalador.
