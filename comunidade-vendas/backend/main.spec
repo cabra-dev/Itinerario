@@ -5,7 +5,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('schema.prisma', 'prisma')],
     hiddenimports=['dotenv', 'prisma'],
     hookspath=[],
     hooksconfig={},
