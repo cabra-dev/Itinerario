@@ -40,13 +40,16 @@ app.whenReady().then(() => {
     log("BACKEND EXISTE: " + fs.existsSync(backendPath));
     log("LOG FILE: " + logFile);
 
-    backendProcess = spawn(backendPath, [], {
-        shell: true,
-        env: {
-            ...process.env,
-            DATABASE_URL: "postgresql://neondb_owner:npg_yWbKJPY6vej8@ep-tiny-darkness-apkawerv.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require"
-        }
-    });
+   backendProcess = spawn(backendPath, [], {
+    shell: true,
+    env: {
+        ...process.env,
+        DATABASE_URL: "postgresql://neondb_owner:npg_yWbKJPY6vej8@ep-tiny-darkness-apkawerv.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require",
+        PRISMA_QUERY_ENGINE_BINARY: app.isPackaged
+            ? path.join(process.resourcesPath, "prisma-engines", "query-engine-windows.exe")
+            : path.join(__dirname, "prisma-engines", "query-engine-windows.exe")
+    }
+});
 
     backendProcess.stdout.on("data", (data) => {
         log("BACKEND: " + data);
