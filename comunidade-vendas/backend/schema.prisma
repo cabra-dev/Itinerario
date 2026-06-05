@@ -12,13 +12,13 @@ datasource db {
 }
 
 model Produto {
-  id        Int      @id @default(autoincrement())
-  nome      String
-  categoria String
-  estoque   Int      @default(0)
-  vendido   Int      @default(0)
-  preco     Float
-  vendas    Venda[]
+  id         Int      @id @default(autoincrement())
+  nome       String
+  categoria  String
+  estoque    Int      @default(0)
+  vendido    Int      @default(0)
+  preco      Float
+  vendas     Venda[]
 }
 
 model Venda {
@@ -28,4 +28,30 @@ model Venda {
   quantidade Int
   valorTotal Float
   dataVenda  DateTime @default(now())
+}
+
+model Usuario {
+  id         Int                 @id @default(autoincrement())
+  nome       String
+  login      String              @unique
+  senha      String
+  perfil     String              @default("usuario")
+  ativo      Boolean             @default(true)
+  categorias UsuarioCategoria[]
+}
+
+model Categoria {
+  id       Int                 @id @default(autoincrement())
+  nome     String              @unique
+  usuarios UsuarioCategoria[]
+}
+
+model UsuarioCategoria {
+  id          Int       @id @default(autoincrement())
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+  usuarioId   Int
+  categoria   Categoria @relation(fields: [categoriaId], references: [id])
+  categoriaId Int
+
+  @@unique([usuarioId, categoriaId])
 }

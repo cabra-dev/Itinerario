@@ -1,31 +1,42 @@
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import { DataProvider } from "./context/DataContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import Header from "./components/Header";
 import Dashboard from "./pages/Dashboard";
 import Inventario from "./pages/Inventario";
 import Vendas from "./pages/Vendas";
-import Cadastro from "./pages/Cadastro"; // Importação já estava ok
+import Cadastro from "./pages/Cadastro";
+import Login from "./pages/Login";
+import Usuarios from "./pages/Usuarios";
 import "./App.css";
 
-export default function App() {
+function AppRoutes() {
+  const { usuario } = useAuth();
+
+  if (!usuario) {
+    return <Login />;
+  }
+
   return (
     <DataProvider>
       <Router>
         <Header />
         <Routes>
-          {/* Página Inicial: Dashboard */}
           <Route path="/" element={<Dashboard />} />
-
-          {/* Listagem de Produtos */}
           <Route path="/inventario" element={<Inventario />} />
-
-          {/* Lançamento de Vendas */}
           <Route path="/vendas" element={<Vendas />} />
-
-          {/* Cadastro de Novos Produtos (Faltava esta linha abaixo) */}
           <Route path="/cadastro" element={<Cadastro />} />
+          <Route path="/usuarios" element={<Usuarios />} />
         </Routes>
       </Router>
     </DataProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   );
 }
