@@ -17,6 +17,7 @@ export default function Inventario() {
   // ===== ESTADO DO MODAL DE CONFIRMAÇÃO =====
   const [modalAberto, setModalAberto] = useState(false);
   const [produtoParaDeletar, setProdutoParaDeletar] = useState<number | null>(null);
+  const [erroDelecao, setErroDelecao] = useState("");
 
   // Lógica de Paginação Segura
   const totalPaginas = Math.max(1, Math.ceil(produtos.length / itensPorPagina));
@@ -31,9 +32,7 @@ export default function Inventario() {
   };
 
   // Executa a deleção após confirmação no modal
-  const [erroDelecao, setErroDelecao] = useState("");
-
-const executarDelecao = async () => {
+  const executarDelecao = async () => {
     if (!produtoParaDeletar) return;
     const sucesso = await deletarProduto(produtoParaDeletar);
     if (!sucesso) {
@@ -65,7 +64,7 @@ const executarDelecao = async () => {
       startY: 30,
       head: [["Produto", "Categoria", "Preço", "Estoque", "Total"]],
       body: tableData,
-      headStyles: { fillColor: [0, 0, 0], textColor: [255, 255, 255] },
+      headStyles: { fillColor: [196, 98, 45], textColor: [255, 255, 255] },
       styles: { fontSize: 10, cellPadding: 5 },
     });
 
@@ -84,7 +83,7 @@ const executarDelecao = async () => {
   if (loading)
     return (
       <div className="container" style={{ textAlign: "center", padding: "2rem" }}>
-        Carregando estoque...
+        <p style={{ color: "#7a5c45" }}>Carregando estoque...</p>
       </div>
     );
 
@@ -100,7 +99,7 @@ const executarDelecao = async () => {
         gap: "15px",
         marginBottom: "1.5rem",
       }}>
-        <h1 style={{ color: "#000000" }}>Estoque de Produtos</h1>
+        <h1 style={{ color: "#3d2b1f" }}>Estoque de Produtos</h1>
 
         <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
           {/* Botão exportar PDF */}
@@ -108,8 +107,8 @@ const executarDelecao = async () => {
             onClick={exportarPDF}
             disabled={produtos.length === 0}
             style={{
-              backgroundColor: produtos.length === 0 ? "#cbd5e1" : "#000000",
-              color: "#ffffff",
+              backgroundColor: produtos.length === 0 ? "#d4b896" : "#c4622d",
+              color: "#fff8f0",
               padding: "10px 20px",
               borderRadius: "8px",
               border: "none",
@@ -125,7 +124,7 @@ const executarDelecao = async () => {
 
           {/* Seletor de itens por página */}
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span style={{ fontSize: "1rem", color: "#000000", fontWeight: "bold" }}>
+            <span style={{ fontSize: "1rem", color: "#3d2b1f", fontWeight: "bold" }}>
               Mostrar:
             </span>
             <select
@@ -137,9 +136,10 @@ const executarDelecao = async () => {
               style={{
                 padding: "8px",
                 borderRadius: "4px",
-                border: "2px solid #000000",
-                color: "#000000",
+                border: "2px solid #c4622d",
+                color: "#3d2b1f",
                 fontWeight: "600",
+                backgroundColor: "#fff8f0"
               }}
             >
               <option value={5}>5 itens</option>
@@ -153,24 +153,24 @@ const executarDelecao = async () => {
       {/* ===== ESTADO VAZIO ===== */}
       {produtos.length === 0 ? (
         <div style={{
-          backgroundColor: "#ffffff",
-          border: "2px dashed #cbd5e1",
+          backgroundColor: "#fff8f0",
+          border: "2px dashed #d4b896",
           borderRadius: "12px",
           padding: "3rem",
           textAlign: "center",
-          color: "#64748b",
+          color: "#7a5c45",
         }}>
           <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>📦</div>
-          <h2 style={{ color: "#334155" }}>Seu estoque está vazio</h2>
+          <h2 style={{ color: "#3d2b1f" }}>Seu estoque está vazio</h2>
           <p>Cadastre produtos para que eles apareçam aqui.</p>
         </div>
       ) : (
         <>
           {/* ===== TABELA DE PRODUTOS ===== */}
-          <div className="card" style={{ padding: "0", overflowX: "auto", border: "1px solid #cbd5e1" }}>
+          <div className="card" style={{ padding: "0", overflowX: "auto", border: "1px solid #d4b896" }}>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ backgroundColor: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>
+                <tr style={{ backgroundColor: "#fdf0e0", borderBottom: "2px solid #d4b896" }}>
                   <th style={thStyle}>Produto</th>
                   <th style={thStyle}>Categoria</th>
                   <th style={thStyle}>Preço</th>
@@ -181,39 +181,30 @@ const executarDelecao = async () => {
               </thead>
               <tbody>
                 {produtosPaginados.map((produto: any) => (
-                  <tr key={produto.id} style={{ borderBottom: "1px solid #e2e8f0" }}>
+                  <tr key={produto.id} style={{ borderBottom: "1px solid #f5e6d0" }}>
 
                     {/* Coluna Nome */}
                     <td style={tdStyle}>
                       {editandoId === produto.id ? (
-                        <input
-                          type="text"
-                          value={formEdit.nome || produto.nome}
+                        <input type="text" value={formEdit.nome || produto.nome}
                           onChange={(e) => setFormEdit({ ...formEdit, nome: e.target.value })}
-                          style={inputEditStyle}
-                        />
+                          style={inputEditStyle} />
                       ) : produto.nome}
                     </td>
 
                     {/* Coluna Categoria */}
                     <td style={tdStyle}>
                       {editandoId === produto.id ? (
-                        <input
-                          type="text"
-                          value={formEdit.categoria || produto.categoria}
+                        <input type="text" value={formEdit.categoria || produto.categoria}
                           onChange={(e) => setFormEdit({ ...formEdit, categoria: e.target.value })}
-                          style={inputEditStyle}
-                        />
+                          style={inputEditStyle} />
                       ) : produto.categoria}
                     </td>
 
                     {/* Coluna Preço */}
                     <td style={tdStyle}>
                       {editandoId === produto.id ? (
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={formEdit.preco ?? produto.preco}
+                        <input type="number" step="0.01" value={formEdit.preco ?? produto.preco}
                           onChange={(e) => {
                             const val = e.target.value;
                             if (val === "") { setFormEdit({ ...formEdit, preco: "" }); return; }
@@ -223,24 +214,19 @@ const executarDelecao = async () => {
                           onBlur={() => {
                             const val = parseFloat(formEdit.preco);
                             if (isNaN(val) || val <= 0) {
-                              alert("O preço deve ser maior que zero.");
                               setFormEdit({ ...formEdit, preco: produto.preco });
                             }
                           }}
-                          style={inputEditStyle}
-                        />
+                          style={inputEditStyle} />
                       ) : `R$ ${produto.preco.toFixed(2)}`}
                     </td>
 
                     {/* Coluna Estoque */}
                     <td style={tdStyle}>
                       {editandoId === produto.id ? (
-                        <input
-                          type="number"
-                          value={formEdit.estoque || produto.estoque}
+                        <input type="number" value={formEdit.estoque || produto.estoque}
                           onChange={(e) => setFormEdit({ ...formEdit, estoque: parseInt(e.target.value) })}
-                          style={inputEditStyle}
-                        />
+                          style={inputEditStyle} />
                       ) : `${produto.estoque} un.`}
                     </td>
 
@@ -254,18 +240,14 @@ const executarDelecao = async () => {
                       {editandoId === produto.id ? (
                         <div style={{ display: "flex", gap: "5px", justifyContent: "center" }}>
                           <button
-                            onClick={() => {
-                              editarProduto(produto.id, formEdit);
-                              setEditandoId(null);
-                              setFormEdit({});
-                            }}
-                            style={{ backgroundColor: "#10b981", color: "#fff", padding: "6px 12px", borderRadius: "4px", border: "none", cursor: "pointer" }}
+                            onClick={() => { editarProduto(produto.id, formEdit); setEditandoId(null); setFormEdit({}); }}
+                            style={{ backgroundColor: "#4a5c3a", color: "#fff8f0", padding: "6px 12px", borderRadius: "4px", border: "none", cursor: "pointer" }}
                           >
                             Salvar
                           </button>
                           <button
                             onClick={() => { setEditandoId(null); setFormEdit({}); }}
-                            style={{ backgroundColor: "#6b7280", color: "#fff", padding: "6px 12px", borderRadius: "4px", border: "none", cursor: "pointer" }}
+                            style={{ backgroundColor: "#7a5c45", color: "#fff8f0", padding: "6px 12px", borderRadius: "4px", border: "none", cursor: "pointer" }}
                           >
                             Cancelar
                           </button>
@@ -274,13 +256,13 @@ const executarDelecao = async () => {
                         <div style={{ display: "flex", gap: "5px", justifyContent: "center" }}>
                           <button
                             onClick={() => { setEditandoId(produto.id); setFormEdit(produto); }}
-                            style={{ backgroundColor: "#3b82f6", color: "#fff", padding: "6px 12px", borderRadius: "4px", border: "none", cursor: "pointer" }}
+                            style={{ backgroundColor: "#2c3e6b", color: "#fff8f0", padding: "6px 12px", borderRadius: "4px", border: "none", cursor: "pointer" }}
                           >
                             Editar
                           </button>
                           <button
                             onClick={() => confirmarDelecao(produto.id)}
-                            style={{ backgroundColor: "#ef4444", color: "#fff", padding: "6px 12px", borderRadius: "4px", border: "none", cursor: "pointer" }}
+                            style={{ backgroundColor: "#8b2020", color: "#fff8f0", padding: "6px 12px", borderRadius: "4px", border: "none", cursor: "pointer" }}
                           >
                             Deletar
                           </button>
@@ -307,15 +289,15 @@ const executarDelecao = async () => {
               style={{
                 padding: "8px 16px",
                 borderRadius: "4px",
-                border: "1px solid #d1d5db",
-                backgroundColor: paginaAtual === 1 ? "#f3f4f6" : "#ffffff",
-                color: paginaAtual === 1 ? "#9ca3af" : "#374151",
+                border: "1px solid #d4b896",
+                backgroundColor: paginaAtual === 1 ? "#f5e6d0" : "#fff8f0",
+                color: paginaAtual === 1 ? "#d4b896" : "#3d2b1f",
                 cursor: paginaAtual === 1 ? "not-allowed" : "pointer",
               }}
             >
               Anterior
             </button>
-            <span style={{ fontWeight: "bold", color: "#374151" }}>
+            <span style={{ fontWeight: "bold", color: "#3d2b1f" }}>
               Página {paginaAtual} de {totalPaginas}
             </span>
             <button
@@ -324,9 +306,9 @@ const executarDelecao = async () => {
               style={{
                 padding: "8px 16px",
                 borderRadius: "4px",
-                border: "1px solid #d1d5db",
-                backgroundColor: paginaAtual === totalPaginas ? "#f3f4f6" : "#ffffff",
-                color: paginaAtual === totalPaginas ? "#9ca3af" : "#374151",
+                border: "1px solid #d4b896",
+                backgroundColor: paginaAtual === totalPaginas ? "#f5e6d0" : "#fff8f0",
+                color: paginaAtual === totalPaginas ? "#d4b896" : "#3d2b1f",
                 cursor: paginaAtual === totalPaginas ? "not-allowed" : "pointer",
               }}
             >
@@ -341,34 +323,34 @@ const executarDelecao = async () => {
         <div style={{
           position: "fixed",
           top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: "rgba(0,0,0,0.6)",
+          backgroundColor: "rgba(61, 43, 31, 0.7)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           zIndex: 9999
         }}>
           <div style={{
-            backgroundColor: "#ffffff",
+            backgroundColor: "#fff8f0",
             padding: "2rem",
             borderRadius: "12px",
             width: "100%",
             maxWidth: "400px",
-            textAlign: "center"
+            textAlign: "center",
+            border: "1px solid #d4b896"
           }}>
-            <h3 style={{ marginBottom: "1rem", color: "#0f172a" }}>Confirmar exclusão</h3>
-            <p style={{ color: "#64748b", marginBottom: "1.5rem" }}>
+            <h3 style={{ marginBottom: "1rem", color: "#3d2b1f" }}>Confirmar exclusão</h3>
+            <p style={{ color: "#7a5c45", marginBottom: "1rem" }}>
               Tem certeza que deseja excluir este produto?
             </p>
-             {/* Mensagem de erro se não puder deletar */}
-      {erroDelecao && (
-        <p style={{ color: "#ef4444", marginBottom: "1rem", fontSize: "0.9rem" }}>
-          {erroDelecao}
-        </p>
-      )}
+            {erroDelecao && (
+              <p style={{ color: "#8b2020", marginBottom: "1rem", fontSize: "0.9rem" }}>
+                {erroDelecao}
+              </p>
+            )}
             <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
               <button onClick={executarDelecao} style={{
-                backgroundColor: "#ef4444",
-                color: "white",
+                backgroundColor: "#8b2020",
+                color: "#fff8f0",
                 border: "none",
                 padding: "10px 24px",
                 borderRadius: "8px",
@@ -377,9 +359,9 @@ const executarDelecao = async () => {
               }}>
                 Confirmar
               </button>
-              <button onClick={() => { setModalAberto(false); setProdutoParaDeletar(null); }} style={{
-                backgroundColor: "#e2e8f0",
-                color: "#0f172a",
+              <button onClick={() => { setModalAberto(false); setProdutoParaDeletar(null); setErroDelecao(""); }} style={{
+                backgroundColor: "#d4b896",
+                color: "#3d2b1f",
                 border: "none",
                 padding: "10px 24px",
                 borderRadius: "8px",
@@ -401,7 +383,7 @@ const thStyle: React.CSSProperties = {
   padding: "12px",
   textAlign: "left",
   fontWeight: "bold",
-  color: "#374151"
+  color: "#3d2b1f"
 };
 
 const tdStyle: React.CSSProperties = {
@@ -409,12 +391,15 @@ const tdStyle: React.CSSProperties = {
   maxWidth: "200px",
   whiteSpace: "nowrap",
   overflow: "hidden",
-  textOverflow: "ellipsis"
+  textOverflow: "ellipsis",
+  color: "#3d2b1f"
 };
 
 const inputEditStyle: React.CSSProperties = {
   width: "100%",
   padding: "8px",
-  border: "1px solid #d1d5db",
-  borderRadius: "4px"
+  border: "1px solid #d4b896",
+  borderRadius: "4px",
+  backgroundColor: "#fdf3e7",
+  color: "#3d2b1f"
 };

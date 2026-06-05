@@ -33,7 +33,8 @@ export default function Login() {
   return (
     <div className="login-container">
       <div className="login-box">
-        <h1>🧶 Comunidade Gestor</h1>
+        <div className="login-icon">🌵</div>
+        <h1>Comunidade Gestor</h1>
         <h2>Entrar</h2>
 
         <input

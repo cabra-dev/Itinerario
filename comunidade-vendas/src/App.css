@@ -1,74 +1,45 @@
-:root {
-  --primary: #2563eb;
-  --secondary: #64748b;
-  --success: #16a34a;
-  --danger: #dc2626;
-  --bg: #f8fafc;
-  --white: #ffffff;
-  --border: #e2e8f0;
-}
-
-/* 1. Reset Global para evitar scroll horizontal indesejado */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: var(--bg);
-  overflow-x: hidden; /* Previne que elementos esticados criem barra lateral no body */
-}
-
-header {
-  width: 100%; /* Use 100% em vez de 100vw para evitar problemas com barra de scroll */
-}
-
-/* 2. Container Responsivo */
+/* ===== CONTAINER PRINCIPAL ===== */
 .container {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 1rem; /* Reduzido para dar mais espaço em celulares */
+  padding: 1rem;
 }
 
-/* Ajuste para telas maiores */
 @media (min-width: 768px) {
   .container {
     padding: 2rem;
   }
 }
 
-/* 3. Grid de Stats Responsivo (Essencial para o Dashboard) */
+/* ===== CARDS ===== */
+.card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(61, 43, 31, 0.1);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ===== GRID DE STATS ===== */
 .grid-stats {
   display: grid;
-  /* Cria colunas automaticamente de no mínimo 250px, se não couber, empilha */
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
-/* 4. Tabela Responsiva */
-.card {
-  background: var(--white);
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  margin-bottom: 1.5rem;
-  
-  /* Faz com que o card permita scroll lateral se a tabela for muito larga */
-  overflow-x: auto; 
-  -webkit-overflow-scrolling: touch; /* Melhora o scroll no iPhone */
-}
-
+/* ===== TABELA ===== */
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 600px; /* Garante que a tabela não "esprema" demais o texto */
+  min-width: 600px;
 }
 
-/* 5. Botões e Inputs */
+/* ===== BOTÕES ===== */
 .btn {
   padding: 0.7rem 1.5rem;
   border-radius: 8px;
@@ -79,22 +50,32 @@ table {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  white-space: nowrap; /* Impede que o texto do botão quebre em 2 linhas */
+  white-space: nowrap;
 }
 
-.btn-primary { background: var(--primary); color: white; }
+.btn-primary {
+  background: var(--accent);
+  color: var(--white);
+}
 
-/* 6. Utilitários de Borda e Texto */
-.border-left-blue { border-left: 5px solid var(--primary); }
-.border-left-green { border-left: 5px solid var(--success); }
-.border-left-orange { border-left: 5px solid #f97316; }
+.btn-primary:hover {
+  background: #a8521f;
+}
 
-.text-success { color: var(--success); font-size: 0.8rem; font-weight: bold; }
-.text-secondary { color: var(--secondary); font-size: 0.8rem; }
+/* ===== BORDAS COLORIDAS ===== */
+.border-left-blue   { border-left: 5px solid var(--blue); }
+.border-left-green  { border-left: 5px solid var(--success); }
+.border-left-orange { border-left: 5px solid var(--accent); }
+.border-left-yellow { border-left: 5px solid var(--accent2); }
 
+/* ===== TEXTOS ===== */
+.text-success   { color: var(--success); font-size: 0.8rem; font-weight: bold; }
+.text-secondary { color: var(--text-light); font-size: 0.8rem; }
+
+/* ===== BADGE ===== */
 .badge-danger {
-  background: #fee2e2;
-  color: #b91c1c;
+  background: #f9d5d5;
+  color: var(--danger);
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -102,14 +83,8 @@ table {
   white-space: nowrap;
 }
 
-/* 7. Ajustes finos para Mobile (Abaixo de 480px) */
+/* ===== MOBILE ===== */
 @media (max-width: 480px) {
   h1 { font-size: 1.5rem; }
   .card { padding: 1rem; }
-  
-  /* Se houver cabeçalhos de página com botões ao lado, empilhar no mobile */
-  header div {
-    flex-direction: column;
-    text-align: center;
-  }
 }
