@@ -1,9 +1,11 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, dialog } = require("electron");
 const { spawn } = require("child_process");
 const path = require("path");
 const fs = require("fs");
+const { autoUpdater } = require("electron-updater");
 
 let backendProcess;
+let mainWindow;
 
 const logFile = path.join(app.getPath("userData"), "debug.log");
 function log(msg) {
@@ -11,21 +13,76 @@ function log(msg) {
     fs.appendFileSync(logFile, msg + "\n");
 }
 
+// ===== CONFIGURAÇÃO DO AUTO UPDATER =====
+function configurarAtualizador() {
+    // Não verifica atualizações em modo desenvolvimento
+    if (!app.isPackaged) {
+        log("Modo desenvolvimento — atualizações desabilitadas.");
+        return;
+    }
+
+    autoUpdater.autoDownload = true;
+    autoUpdater.autoInstallOnAppQuit = true;
+
+    // Verifica atualização ao iniciar
+    autoUpdater.checkForUpdates();
+
+    // Atualização disponível — inicia download automático
+    autoUpdater.on("update-available", (info) => {
+        log("Atualizacao disponivel: " + info.version);
+    });
+
+    // Nenhuma atualização disponível
+    autoUpdater.on("update-not-available", () => {
+        log("App ja esta na versao mais recente.");
+    });
+
+    // Download concluído — pergunta se quer reiniciar
+    autoUpdater.on("update-downloaded", (info) => {
+        log("Atualizacao baixada: " + info.version);
+        dialog.showMessageBox(mainWindow, {
+            type: "info",
+            title: "Atualização disponível",
+            message: `Nova versão ${info.version} disponível!`,
+            detail: "A atualização foi baixada. Deseja reiniciar o app agora para aplicar?",
+            buttons: ["Reiniciar agora", "Depois"],
+            defaultId: 0
+        }).then((result) => {
+            if (result.response === 0) {
+                autoUpdater.quitAndInstall();
+            }
+        });
+    });
+
+    // Erro no updater
+    autoUpdater.on("error", (err) => {
+        log("Erro no auto updater: " + err.message);
+    });
+}
+
 function createWindow() {
-    const win = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         width: 1200,
         height: 800,
         webPreferences: { devTools: true }
     });
 
-    win.webContents.openDevTools();
+    // DevTools apenas em desenvolvimento
+    if (!app.isPackaged) {
+        mainWindow.webContents.openDevTools();
+    }
 
     const filePath = path.join(__dirname, "dist", "index.html");
     log("INDEX PATH: " + filePath);
-    win.loadFile(filePath);
+    mainWindow.loadFile(filePath);
 
-    win.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
         log('ERRO LOAD: ' + errorCode + ' ' + errorDescription);
+    });
+
+    // Verifica atualizações após janela abrir
+    mainWindow.webContents.on('did-finish-load', () => {
+        configurarAtualizador();
     });
 }
 
@@ -64,4 +121,11 @@ app.whenReady().then(() => {
     });
 
     createWindow();
+});
+
+// ===== FECHA O BACKEND AO FECHAR O APP =====
+app.on("before-quit", () => {
+    if (backendProcess) {
+        backendProcess.kill();
+    }
 });

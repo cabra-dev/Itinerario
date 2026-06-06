@@ -16,10 +16,10 @@
     "appId": "com.comunidade.gestor",
     "productName": "Comunidade Gestor",
     "publish": {
-  "provider": "github",
-  "owner": "cabra-dev",
-  "repo": "Itinerario"
-  },
+      "provider": "github",
+      "owner": "cabra-dev",
+      "repo": "Itinerario"
+    },
     "files": [
       "dist/**/*",
       "electron.cjs"
@@ -37,7 +37,6 @@
         "from": "prisma-engines",
         "to": "prisma-engines"
       },
-
       {
         "from": "backend/dist/query-engine-windows.exe",
         "to": "backend/dist/query-engine-windows.exe"
@@ -49,6 +48,7 @@
   },
   "dependencies": {
     "axios": "^1.16.0",
+    "electron-updater": "^6.8.9",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "react": "^19.2.5",
