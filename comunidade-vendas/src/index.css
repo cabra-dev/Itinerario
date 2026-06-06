@@ -2,19 +2,19 @@
 
 :root {
   /* ===== PALETA NORDESTINA/DESERTO ===== */
-  --bg: #f5e6d0;           /* Areia clara — fundo principal */
-  --bg-dark: #2d1f0e;      /* Marrom escuro — painéis e cards escuros */
-  --card: #fff8f0;         /* Creme — cards claros */
-  --accent: #c4622d;       /* Terracota — cor principal de destaque */
-  --accent2: #c9a84c;      /* Mostarda — botões e destaques secundários */
-  --text: #3d2b1f;         /* Marrom texto — texto principal */
-  --text-light: #7a5c45;   /* Marrom claro — texto secundário */
-  --border: #d4b896;       /* Bege — bordas */
-  --success: #4a5c3a;      /* Verde seco */
-  --danger: #8b2020;       /* Vermelho escuro */
-  --blue: #2c3e6b;         /* Azul sertão */
-  --white: #fff8f0;        /* Branco creme */
-  --input: #fdf3e7;        /* Fundo de inputs */
+  --bg: #f5e6d0;
+  --bg-dark: #2d1f0e;
+  --card: #fff8f0;
+  --accent: #c4622d;
+  --accent2: #c9a84c;
+  --text: #3d2b1f;
+  --text-light: #7a5c45;
+  --border: #d4b896;
+  --success: #4a5c3a;
+  --danger: #8b2020;
+  --blue: #2c3e6b;
+  --white: #fff8f0;
+  --input: #fdf3e7;
 
   font-family: 'Inter', sans-serif;
   font-size: 16px;
@@ -31,6 +31,10 @@
 
 body {
   background-color: var(--bg);
+  /* ===== PATTERN DE CORDEL/XILOGRAVURA NO FUNDO ===== */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cg fill='none' stroke='%23c4622d' stroke-width='0.5' opacity='0.12'%3E%3C!-- Losango externo --%3E%3Cpolygon points='30,2 58,30 30,58 2,30'/%3E%3C!-- Losango interno --%3E%3Cpolygon points='30,12 48,30 30,48 12,30'/%3E%3C!-- Cruz central --%3E%3Cline x1='30' y1='2' x2='30' y2='58'/%3E%3Cline x1='2' y1='30' x2='58' y2='30'/%3E%3C!-- Diagonais --%3E%3Cline x1='2' y1='2' x2='58' y2='58'/%3E%3Cline x1='58' y1='2' x2='2' y2='58'/%3E%3C!-- Pontos nos cantos --%3E%3Ccircle cx='2' cy='2' r='1.5' fill='%23c4622d'/%3E%3Ccircle cx='58' cy='2' r='1.5' fill='%23c4622d'/%3E%3Ccircle cx='2' cy='58' r='1.5' fill='%23c4622d'/%3E%3Ccircle cx='58' cy='58' r='1.5' fill='%23c4622d'/%3E%3C!-- Ponto central --%3E%3Ccircle cx='30' cy='30' r='2' fill='%23c4622d'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 60px 60px;
   color: var(--text);
   overflow-x: hidden;
 }
@@ -45,4 +49,9 @@ h1, h2, h3 {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* ===== CARDS COM FUNDO SÓLIDO PARA NÃO VAZAR O PATTERN ===== */
+.card {
+  background-color: var(--card) !important;
 }
