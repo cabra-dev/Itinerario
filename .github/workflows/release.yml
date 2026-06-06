@@ -10,68 +10,61 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # 1. Baixa o código
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 2. Configura Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      # 3. Configura Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # 4. Instala dependências do frontend
       - name: Instala dependências Node
         run: npm install
+        working-directory: comunidade-vendas
 
-      # 5. Instala dependências do backend
       - name: Instala dependências Python
         run: |
-          cd backend
           pip install -r requirements.txt
           pip install pyinstaller
+        working-directory: comunidade-vendas/backend
 
-      # 6. Compila o backend
       - name: Compila backend
         run: |
-          cd backend
           python -m PyInstaller --onefile --hidden-import dotenv --hidden-import prisma --add-data "schema.prisma;prisma" main.py
+        working-directory: comunidade-vendas/backend
 
-      # 7. Copia binário do Prisma
       - name: Busca binário do Prisma
         run: |
           python -m prisma py fetch
           $prismaPath = Get-ChildItem "$env:USERPROFILE\.cache\prisma-python\binaries" -Recurse -Filter "query-engine-windows.exe" | Select-Object -First 1 -ExpandProperty FullName
-          Copy-Item $prismaPath "backend\dist\query-engine-windows.exe"
+          Copy-Item $prismaPath "comunidade-vendas\backend\dist\query-engine-windows.exe"
         shell: powershell
 
-      # 8. Cria .env para o build
       - name: Cria .env
         run: |
           echo DATABASE_URL="${{ secrets.DATABASE_URL }}" > .env
           echo VITE_API_URL=http://localhost:8000 >> .env
+        working-directory: comunidade-vendas
 
-      # 9. Build do frontend
       - name: Build frontend
         run: npm run build
+        working-directory: comunidade-vendas
 
-      # 10. Gera instalador
       - name: Gera instalador
         run: npm run dist-app
+        working-directory: comunidade-vendas
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 11. Publica no GitHub Releases
       - name: Publica Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/*.exe
+          files: comunidade-vendas/dist/*.exe
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
