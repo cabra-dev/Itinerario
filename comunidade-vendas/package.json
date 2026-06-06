@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "electron": "electron .",
-    "dist-app": "electron-builder"
+    "dist-app": "electron-builder --publish never"
   },
   "build": {
     "appId": "com.comunidade.gestor",
