@@ -23,11 +23,11 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Instala dependências Node
+      - name: Instala dependencias Node
         run: npm install
         working-directory: comunidade-vendas
 
-      - name: Instala dependências Python
+      - name: Instala dependencias Python
         run: |
           pip install -r requirements.txt
           pip install pyinstaller
@@ -38,28 +38,10 @@ jobs:
           python -m PyInstaller --onefile --hidden-import dotenv --hidden-import prisma --add-data "schema.prisma;prisma" main.py
         working-directory: comunidade-vendas/backend
 
-      - name: Busca binário do Prisma
+      - name: Copia binario do Prisma
         run: |
-          python -m prisma py fetch
-          $cache = "$env:USERPROFILE\.cache\prisma-python\binaries"
-          Write-Host "Cache path: $cache"
-          if (Test-Path $cache) {
-            Get-ChildItem $cache -Recurse | ForEach-Object { Write-Host $_.FullName }
-          } else {
-            Write-Host "Cache nao existe em $cache"
-            # Tenta outro caminho
-            $cache2 = "$env:LOCALAPPDATA\prisma-python\binaries"
-            Write-Host "Tentando: $cache2"
-            Get-ChildItem $cache2 -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
-          }
-          $prismaPath = Get-ChildItem "$env:USERPROFILE" -Recurse -Filter "query-engine-windows.exe" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
-          Write-Host "Encontrado em: $prismaPath"
-          if ($prismaPath) {
-            Copy-Item $prismaPath "comunidade-vendas\backend\dist\query-engine-windows.exe"
-          } else {
-            Write-Error "Binario nao encontrado!"
-            exit 1
-          }
+          Copy-Item "comunidade-vendas\prisma-engines\query-engine-windows.exe" "comunidade-vendas\backend\dist\query-engine-windows.exe"
+          Write-Host "Binario copiado com sucesso!"
         shell: powershell
 
       - name: Cria .env
