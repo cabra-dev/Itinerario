@@ -42,7 +42,9 @@ jobs:
         run: |
           python -m prisma py fetch
           $cache = "$env:USERPROFILE\.cache\prisma-python\binaries"
-          $prismaPath = Get-ChildItem $cache -Recurse -Filter "query-engine-windows.exe" | Where-Object { $_.FullName -notlike "*schema*" } | Select-Object -First 1 -ExpandProperty FullName
+          Write-Host "Listando cache:"
+          Get-ChildItem $cache -Recurse | Select-Object FullName
+          $prismaPath = Get-ChildItem $cache -Recurse -Include "query-engine-windows.exe" | Select-Object -First 1 -ExpandProperty FullName
           Write-Host "Prisma path: $prismaPath"
           if ($prismaPath) {
             Copy-Item $prismaPath "comunidade-vendas\backend\dist\query-engine-windows.exe"
