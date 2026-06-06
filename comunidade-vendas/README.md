@@ -125,6 +125,7 @@ O instalador será gerado em `dist/Comunidade Gestor Setup 0.0.0.exe`.
 
 ## 📁 Estrutura do Projeto
 
+```
 comunidade-vendas/
 ├── .github/
 │   └── workflows/
@@ -144,6 +145,7 @@ comunidade-vendas/
 ├── electron.cjs          # Configuração do Electron
 ├── package.json
 └── vite.config.ts
+```
 
 ---
 
