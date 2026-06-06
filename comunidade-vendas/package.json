@@ -15,6 +15,11 @@
   "build": {
     "appId": "com.comunidade.gestor",
     "productName": "Comunidade Gestor",
+    "publish": {
+  "provider": "github",
+  "owner": "cabra-dev",
+  "repo": "Itinerario"
+  },
     "files": [
       "dist/**/*",
       "electron.cjs"
