@@ -58,7 +58,8 @@ jobs:
         run: npm run dist-app
         working-directory: comunidade-vendas
         env:
-          CSC_IDENTITY_AUTO_DISCOVERY: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISH: never
 
       - name: Publica Release
         uses: softprops/action-gh-release@v2
