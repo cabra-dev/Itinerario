@@ -41,8 +41,15 @@ jobs:
       - name: Busca binário do Prisma
         run: |
           python -m prisma py fetch
-          $prismaPath = Get-ChildItem "$env:USERPROFILE\.cache\prisma-python\binaries" -Recurse -Filter "query-engine-windows.exe" | Select-Object -First 1 -ExpandProperty FullName
-          Copy-Item $prismaPath "comunidade-vendas\backend\dist\query-engine-windows.exe"
+          $cache = "$env:USERPROFILE\.cache\prisma-python\binaries"
+          $prismaPath = Get-ChildItem $cache -Recurse -Filter "query-engine-windows.exe" | Where-Object { $_.FullName -notlike "*schema*" } | Select-Object -First 1 -ExpandProperty FullName
+          Write-Host "Prisma path: $prismaPath"
+          if ($prismaPath) {
+            Copy-Item $prismaPath "comunidade-vendas\backend\dist\query-engine-windows.exe"
+          } else {
+            Write-Error "Binario do Prisma nao encontrado!"
+            exit 1
+          }
         shell: powershell
 
       - name: Cria .env
