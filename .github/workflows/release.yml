@@ -35,16 +35,17 @@ jobs:
           pip install pyinstaller
         working-directory: comunidade-vendas/backend
 
+      - name: Baixa Prisma Query Engine
+        run: prisma py fetch
+        working-directory: comunidade-vendas/backend
+
       - name: Compila backend
         run: |
-          python -m PyInstaller --onefile --collect-all prisma --hidden-import dotenv --add-data "schema.prisma;prisma" main.py
-        working-directory: comunidade-vendas/backend
-        
-      - name: Copia binario do Prisma
-        run: |
-          Copy-Item "comunidade-vendas\prisma-engines\query-engine-windows.exe" "comunidade-vendas\backend\dist\query-engine-windows.exe"
-          Write-Host "Binario copiado com sucesso!"
+          $enginePath = (Get-ChildItem -Recurse -Filter "query-engine-windows.exe" "$env:USERPROFILE\.cache\prisma-python" | Select-Object -First 1).FullName
+          Write-Host "Engine encontrado em: $enginePath"
+          python -m PyInstaller --onefile --collect-all prisma --hidden-import dotenv --add-data "schema.prisma;prisma" --add-binary "$enginePath;." main.py
         shell: powershell
+        working-directory: comunidade-vendas/backend
 
       - name: Cria .env
         run: |
