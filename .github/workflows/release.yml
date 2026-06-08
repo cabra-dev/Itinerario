@@ -35,6 +35,10 @@ jobs:
           pip install pyinstaller
         working-directory: comunidade-vendas/backend
 
+      - name: Gera Prisma Client
+        run: prisma generate
+        working-directory: comunidade-vendas/backend
+
       - name: Compila backend
         run: |
           $enginePath = "${{ github.workspace }}\comunidade-vendas\prisma-engines\query-engine-windows.exe"
