@@ -123,10 +123,13 @@ async def login(dados: LoginRequest):
             "perfil": usuario.perfil,
             "categorias": cats
         }
-    except HTTPException as e:
-        raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Erro ao fazer login.")
+        import traceback
+        print(traceback.format_exc())
+        raise HTTPException(
+        status_code=500,
+        detail=str(e)
+    )
 
 @app.get("/auth/usuarios")
 async def listar_usuarios():

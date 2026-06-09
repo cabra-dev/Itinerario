@@ -101,7 +101,7 @@ app.whenReady().then(() => {
         shell: true,
         env: {
             ...process.env,
-            DATABASE_URL: "postgresql://postgres:Geladeira123!@db.hwprxfaoyrqrdlbfshgl.supabase.co:5432/postgres",
+           DATABASE_URL: "postgresql://postgres:Geladeira123!@db.hwprxfaoyrqrdlbfshgl.supabase.co:6543/postgres?pgbouncer=true",
             PRISMA_QUERY_ENGINE_BINARY: app.isPackaged
                 ? path.join(process.resourcesPath, "prisma-engines", "query-engine-windows.exe")
                 : path.join(__dirname, "prisma-engines", "query-engine-windows.exe")
