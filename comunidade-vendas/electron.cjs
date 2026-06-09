@@ -15,7 +15,6 @@ function log(msg) {
 
 // ===== CONFIGURAÇÃO DO AUTO UPDATER =====
 function configurarAtualizador() {
-    // Não verifica atualizações em modo desenvolvimento
     if (!app.isPackaged) {
         log("Modo desenvolvimento — atualizações desabilitadas.");
         return;
@@ -24,20 +23,16 @@ function configurarAtualizador() {
     autoUpdater.autoDownload = true;
     autoUpdater.autoInstallOnAppQuit = true;
 
-    // Verifica atualização ao iniciar
     autoUpdater.checkForUpdates();
 
-    // Atualização disponível — inicia download automático
     autoUpdater.on("update-available", (info) => {
         log("Atualizacao disponivel: " + info.version);
     });
 
-    // Nenhuma atualização disponível
     autoUpdater.on("update-not-available", () => {
         log("App ja esta na versao mais recente.");
     });
 
-    // Download concluído — pergunta se quer reiniciar
     autoUpdater.on("update-downloaded", (info) => {
         log("Atualizacao baixada: " + info.version);
         dialog.showMessageBox(mainWindow, {
@@ -54,7 +49,6 @@ function configurarAtualizador() {
         });
     });
 
-    // Erro no updater
     autoUpdater.on("error", (err) => {
         log("Erro no auto updater: " + err.message);
     });
@@ -67,7 +61,6 @@ function createWindow() {
         webPreferences: { devTools: true }
     });
 
-    // DevTools apenas em desenvolvimento
     if (!app.isPackaged) {
         mainWindow.webContents.openDevTools();
     }
@@ -80,7 +73,6 @@ function createWindow() {
         log('ERRO LOAD: ' + errorCode + ' ' + errorDescription);
     });
 
-    // Verifica atualizações após janela abrir
     mainWindow.webContents.on('did-finish-load', () => {
         configurarAtualizador();
     });
@@ -97,14 +89,11 @@ app.whenReady().then(() => {
     log("BACKEND EXISTE: " + fs.existsSync(backendPath));
     log("LOG FILE: " + logFile);
 
+    // DATABASE_URL removida daqui — agora está embutida dentro do main.exe
     backendProcess = spawn(backendPath, [], {
         shell: true,
         env: {
-            ...process.env,
-            DATABASE_URL: "postgresql://postgres.hwprxfaoyrqrdlbfshgl:Geladeira123!@aws-1-sa-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true",
-            PRISMA_QUERY_ENGINE_BINARY: app.isPackaged
-                ? path.join(process.resourcesPath, "prisma-engines", "query-engine-windows.exe")
-                : path.join(__dirname, "prisma-engines", "query-engine-windows.exe")
+            ...process.env
         }
     });
 

@@ -1,11 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-
 export default function Header() {
   const { usuario, logout } = useAuth();
-
   return (
-    <header style={{ 
+    <header style={{
       backgroundColor: '#2d1f0e',
       padding: '1rem 5%',
       color: '#f5e6d0',
@@ -25,26 +23,23 @@ export default function Header() {
       {/* ===== LOGO ===== */}
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <h2 style={{ margin: 0, fontSize: '1.4rem', whiteSpace: 'nowrap' }}>
-          <span style={{ color: '#c9a84c' }}>Comunidade</span>
-          <span style={{ color: '#f5e6d0' }}> Gestor</span>
+          <span style={{ color: '#c9a84c' }}>Bodega</span>
+          <span style={{ color: '#f5e6d0' }}> Digital</span>
         </h2>
       </div>
-
       {/* ===== NAV ===== */}
-      <nav style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: '15px', 
+      <nav style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '15px',
         flexWrap: 'wrap',
-        justifyContent: 'center' 
+        justifyContent: 'center'
       }}>
         <Link to="/" style={navItemStyle}>Início</Link>
         <Link to="/inventario" style={navItemStyle}>Estoque</Link>
         <Link to="/vendas" style={navItemStyle}>Vendas</Link>
-
         {usuario?.perfil === 'admin' && (
           <>
-            {/* Botão Novo Item — mostarda */}
             <Link to="/cadastro" style={{
               ...navItemStyle,
               backgroundColor: '#c9a84c',
@@ -57,8 +52,6 @@ export default function Header() {
             }}>
               + Novo Item
             </Link>
-
-            {/* Botão Usuários — terracota suave */}
             <Link to="/usuarios" style={{
               ...navItemStyle,
               backgroundColor: '#5c3520',
@@ -71,8 +64,6 @@ export default function Header() {
             </Link>
           </>
         )}
-
-        {/* Nome e botão Sair */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{ fontSize: '0.85rem', color: '#d4b896' }}>
             {usuario?.nome}
@@ -94,7 +85,6 @@ export default function Header() {
     </header>
   );
 }
-
 const navItemStyle = {
   color: '#f5e6d0',
   textDecoration: 'none',

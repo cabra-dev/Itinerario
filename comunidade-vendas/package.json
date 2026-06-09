@@ -1,5 +1,5 @@
 {
-  "name": "comunidade-vendas",
+  "name": "bodega-digital",
   "private": true,
   "version": "0.0.0",
   "main": "electron.cjs",
@@ -13,8 +13,8 @@
     "dist-app": "electron-builder --publish never"
   },
   "build": {
-    "appId": "com.comunidade.gestor",
-    "productName": "Comunidade Gestor",
+    "appId": "com.bodega.digital",
+    "productName": "Bodega Digital",
     "publish": {
       "provider": "github",
       "owner": "cabra-dev",
